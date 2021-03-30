@@ -1,13 +1,7 @@
-import {
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-} from "@chakra-ui/react";
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import React from "react";
 
-export default function Main() {
+export default function Main(): JSX.Element {
   return (
     <>
       <Tabs size="md" variant="enclosed">
@@ -31,4 +25,3 @@ export default function Main() {
     </>
   );
 }
-
