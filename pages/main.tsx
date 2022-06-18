@@ -1,13 +1,25 @@
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { AxiosResponse } from "axios";
 import React from "react";
+import { getRank } from "../repository/api/rank";
 
 export default function Main(): JSX.Element {
+  let res: AxiosResponse<any, any> | any;
+  const getRankList = async () => {
+    try {
+      res = await getRank();
+      console.log("front", res);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <>
       <Tabs size="md" variant="enclosed">
         <TabList>
           <Tab>更新された作品</Tab>
-          <Tab>なろうランキング</Tab>
+          <Tab onClick={() => getRankList()}>なろうランキング</Tab>
           <Tab>作品検索</Tab>
         </TabList>
         <TabPanels>
@@ -16,6 +28,7 @@ export default function Main(): JSX.Element {
           </TabPanel>
           <TabPanel>
             <p>なろうのランキングをここにだして面白そうなものを読むよ</p>
+            {res}
           </TabPanel>
           <TabPanel>
             <p>作品の検索をするよ</p>
