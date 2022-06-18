@@ -7,7 +7,7 @@ export default function Main(): JSX.Element {
   const [res, setRes] = useState<AxiosResponse<any, any> | any>("");
   const getRankList = async () => {
     try {
-      const response = await getRank();
+      const response = await getRank("rank/rankget/?rtype=20220501-m");
       console.log("front", response);
       setRes(response);
     } catch (e) {
