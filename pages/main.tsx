@@ -1,14 +1,15 @@
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
-import React from "react";
+import React, { useState } from "react";
 import { getRank } from "../repository/api/rank";
 
 export default function Main(): JSX.Element {
-  let res: AxiosResponse<any, any> | any;
+  const [res, setRes] = useState<AxiosResponse<any, any> | any>("");
   const getRankList = async () => {
     try {
-      res = await getRank();
-      console.log("front", res);
+      const response = await getRank();
+      console.log("front", response);
+      setRes(response);
     } catch (e) {
       console.log(e);
     }
