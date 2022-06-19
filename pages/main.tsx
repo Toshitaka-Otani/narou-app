@@ -1,15 +1,32 @@
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { AxiosResponse } from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getRank } from "../repository/api/rank";
 
 export default function Main(): JSX.Element {
-  const [res, setRes] = useState<AxiosResponse<any, any> | any>("");
+  const [monthRank, setMonthRank] = useState<string>("");
+  const [res, setRes] = useState([""]);
+
+  useEffect(() => {
+    const d = new Date();
+    const strYear = String(d.getFullYear());
+    const strMonth = () => {
+      const month = d.getMonth() + 1;
+      return d.getMonth() + 1 < 10 ? "0" + String(month) : String(month);
+    };
+    setMonthRank(strYear + strMonth() + "01-m");
+  }, []);
+
   const getRankList = async () => {
     try {
-      const response = await getRank("rank/rankget/?rtype=20220501-m");
-      console.log("front", response);
-      setRes(response);
+      const response = await getRank(
+        `rank/rankget/?out=json&rtype=${monthRank}`
+      );
+      console.log(
+        "front",
+        response.filter((r) => r.rank <= 50)
+      );
+      setRes(response.filter((r) => r.rank <= 50));
     } catch (e) {
       console.log(e);
     }
@@ -29,7 +46,9 @@ export default function Main(): JSX.Element {
           </TabPanel>
           <TabPanel>
             <p>なろうのランキングをここにだして面白そうなものを読むよ</p>
-            {res}
+            {res.map((r) => {
+              return <>{r.ncode}</>;
+            })}
           </TabPanel>
           <TabPanel>
             <p>作品の検索をするよ</p>
