@@ -1,36 +1,47 @@
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { AxiosResponse } from "axios";
+import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { getRank } from "../repository/api/rank";
+import { getBookData, getRank } from "../repository/api/rank";
 
 export default function Main(): JSX.Element {
   const [monthRank, setMonthRank] = useState<string>("");
-  const [res, setRes] = useState([""]);
+  const [res, setRes] = useState<r[]>([]);
 
   useEffect(() => {
     const d = new Date();
     const strYear = String(d.getFullYear());
-    const strMonth = () => {
-      const month = d.getMonth() + 1;
-      return d.getMonth() + 1 < 10 ? "0" + String(month) : String(month);
-    };
-    setMonthRank(strYear + strMonth() + "01-m");
+    const month = d.getMonth() + 1;
+    const strMonth = month < 10 ? "0" + String(month) : String(month);
+    setMonthRank(strYear + strMonth + "01-m");
   }, []);
+
+  type r = {
+    ncode: string;
+    pt: number;
+    rank: number;
+  };
 
   const getRankList = async () => {
     try {
       const response = await getRank(
         `rank/rankget/?out=json&rtype=${monthRank}`
       );
-      console.log(
-        "front",
-        response.filter((r) => r.rank <= 50)
-      );
-      setRes(response.filter((r) => r.rank <= 50));
+      typeof response === "string"
+        ? console.error("main.tsx:29", response)
+        : setRes(response.flatMap((r: r) => (r.rank <= 2 ? r : [])));
     } catch (e) {
       console.log(e);
     }
   };
+
+  useEffect(() => {
+    try {
+      res.map((r) => {
+        getBookData(`novelapi/api?out=json&ncode=${r.ncode}`);
+      });
+    } finally {
+      console.log("finally");
+    }
+  }, [res]);
 
   return (
     <>
@@ -46,8 +57,8 @@ export default function Main(): JSX.Element {
           </TabPanel>
           <TabPanel>
             <p>なろうのランキングをここにだして面白そうなものを読むよ</p>
-            {res.map((r) => {
-              return <>{r.ncode}</>;
+            {res.map((r: r, i) => {
+              return <Box key={i}>{r.ncode}</Box>;
             })}
           </TabPanel>
           <TabPanel>
