@@ -5,6 +5,7 @@ import { getBookData, getRank } from "../repository/api/rank";
 export default function Main(): JSX.Element {
   const [monthRank, setMonthRank] = useState<string>("");
   const [res, setRes] = useState<r[]>([]);
+  const [boolList, setBookList] = useState<[]>([])
 
   useEffect(() => {
     const d = new Date();
@@ -20,11 +21,14 @@ export default function Main(): JSX.Element {
     rank: number;
   };
 
+  const apiUrl = {
+    rankApi: 'rank/rankget/?out=json&rtype=',
+    bookApi: 'novelapi/api?out=json&ncode='
+  }
+
   const getRankList = async () => {
     try {
-      const response = await getRank(
-        `rank/rankget/?out=json&rtype=${monthRank}`
-      );
+      const response = await getRank(apiUrl.rankApi + monthRank);
       typeof response === "string"
         ? console.error("main.tsx:29", response)
         : setRes(response.flatMap((r: r) => (r.rank <= 2 ? r : [])));
@@ -34,10 +38,12 @@ export default function Main(): JSX.Element {
   };
 
   useEffect(() => {
+    // Todo: 型指定
     try {
-      res.map((r) => {
-        getBookData(`novelapi/api?out=json&ncode=${r.ncode}`);
-      });
+      setBookList(res.map((r) => {
+        getBookData(apiUrl.bookApi + r.ncode);
+      }))
+
     } finally {
       console.log("finally");
     }
