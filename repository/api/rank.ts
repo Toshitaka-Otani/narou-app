@@ -12,7 +12,7 @@ export const getBookList = async (param: string) => {
     });
   if (Array.isArray(res)) {
     const list = res.flatMap((rankData: Ranking) =>
-      rankData.rank <= 2 ? rankData : []
+      rankData.rank <= 10 ? rankData : []
     );
     const response: (NarouBook | string)[] = await Promise.all(
       list.map(async (r) => {
