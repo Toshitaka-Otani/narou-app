@@ -1,7 +1,6 @@
 import axios from "../../axios";
 
-export const getRank = async (param) => {
-  console.log("aaaa");
+export const getBookList = async (param: string) => {
   const res: [] | string = await axios
     .get(`/api/proxy/${param}`)
     .then((res) => {
@@ -11,10 +10,31 @@ export const getRank = async (param) => {
       console.log("error message", e);
       return e;
     });
-  return res;
+  if (Array.isArray(res)) {
+    const list = res.flatMap((rankData: Ranking) =>
+      rankData.rank <= 2 ? rankData : []
+    );
+    const response: (NarouBook | string)[] = await Promise.all(
+      list.map(async (r) => {
+        const t = await getBookData(r);
+        return t;
+      })
+    );
+    return response;
+  } else {
+    return res;
+  }
 };
 
-export const getBookData = async (param) => {
-  const r = await axios.get(`/api/proxy/${param}`);
-  console.log(r.data);
+export const getBookData = async (rankData: Ranking) => {
+  return await axios
+    .get(`/api/proxy/novelapi/api?out=json&ncode=${rankData.ncode}`)
+    .then((res) => {
+      const narou: NarouBook = res.data;
+      return narou;
+    })
+    .catch((e: string) => {
+      console.log("returnApiError", e);
+      return e;
+    });
 };

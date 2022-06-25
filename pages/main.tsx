@@ -1,10 +1,12 @@
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import { getBookData, getRank } from "../repository/api/rank";
+import React, { useEffect, useMemo, useState } from "react";
+import { getBookList } from "../repository/api/rank";
 
 export default function Main(): JSX.Element {
   const [monthRank, setMonthRank] = useState<string>("");
-  const [res, setRes] = useState<r[]>([]);
+  const [rankingDataList, setRankingDataList] = useState<
+    (NarouBook | string)[]
+  >([]);
 
   useEffect(() => {
     const d = new Date();
@@ -14,41 +16,25 @@ export default function Main(): JSX.Element {
     setMonthRank(strYear + strMonth + "01-m");
   }, []);
 
-  type r = {
-    ncode: string;
-    pt: number;
-    rank: number;
-  };
-
-  const getRankList = async () => {
+  const bookList = useMemo(async () => {
     try {
-      const response = await getRank(
+      const response: string | (NarouBook | string)[] = await getBookList(
         `rank/rankget/?out=json&rtype=${monthRank}`
       );
-      typeof response === "string"
-        ? console.error("main.tsx:29", response)
-        : setRes(response.flatMap((r: r) => (r.rank <= 2 ? r : [])));
+      if (Array.isArray(response)) {
+        setRankingDataList(response);
+      }
     } catch (e) {
       console.log(e);
     }
-  };
-
-  useEffect(() => {
-    try {
-      res.map((r) => {
-        getBookData(`novelapi/api?out=json&ncode=${r.ncode}`);
-      });
-    } finally {
-      console.log("finally");
-    }
-  }, [res]);
+  }, [monthRank]);
 
   return (
     <>
       <Tabs size="md" variant="enclosed">
         <TabList>
           <Tab>更新された作品</Tab>
-          <Tab onClick={() => getRankList()}>なろうランキング</Tab>
+          <Tab onClick={() => bookList}>なろうランキング</Tab>
           <Tab>作品検索</Tab>
         </TabList>
         <TabPanels>
@@ -57,8 +43,16 @@ export default function Main(): JSX.Element {
           </TabPanel>
           <TabPanel>
             <p>なろうのランキングをここにだして面白そうなものを読むよ</p>
-            {res.map((r: r, i) => {
-              return <Box key={i}>{r.ncode}</Box>;
+            {rankingDataList.map((rd, i) => {
+              return (
+                <div key={i}>
+                  {Array.isArray(rd) ? (
+                    <Box>{rd[1].title}</Box>
+                  ) : (
+                    <Box>タイトルを取得できませんでした</Box>
+                  )}
+                </div>
+              );
             })}
           </TabPanel>
           <TabPanel>
