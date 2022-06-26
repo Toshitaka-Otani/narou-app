@@ -158,7 +158,7 @@ export default function Main(): JSX.Element {
                         </>
                       ) : (
                         <>
-                          <Box>ランキング：{i + 1}</Box>
+                          <Box>{i + 1}位</Box>
                           <Box>タイトルを取得できませんでした</Box>
                         </>
                       )}
