@@ -1,210 +1,192 @@
-import Head from "next/head";
-import React from "react";
+import {
+  Badge,
+  Box,
+  Container,
+  HStack,
+  Link,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  VStack,
+} from "@chakra-ui/react";
+import React, { useEffect, useMemo, useState } from "react";
+import { getBookList } from "../repository/api/rank";
 
-export default function Home() {
+export default function App(): JSX.Element {
+  const [monthRank, setMonthRank] = useState<string>("");
+  const [rankingDataList, setRankingDataList] = useState<
+    (NarouBook | string)[]
+  >([]);
+
+  useEffect(() => {
+    const d = new Date();
+    const strYear = String(d.getFullYear());
+    const month = d.getMonth() + 1;
+    const strMonth = month < 10 ? "0" + String(month) : String(month);
+    setMonthRank(strYear + strMonth + "01-m");
+  }, []);
+
+  const bookList = useMemo(async () => {
+    try {
+      const response: string | (NarouBook | string)[] = await getBookList(
+        `rank/rankget/?out=json&rtype=${monthRank}`
+      );
+      if (Array.isArray(response)) {
+        setRankingDataList(response);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [monthRank]);
+
+  const bookType = (end: number, novel_type: number) => {
+    if (end) {
+      return ["連載中", "teal"];
+    } else {
+      return novel_type === 2 ? ["短編", "yellow"] : ["完結済", "blackAlpha"];
+    }
+  };
+
+  const nGenre = (genre: number) => {
+    return genre === 101
+      ? ["異世界〔恋愛〕", "pink"]
+      : genre === 102
+      ? ["現実世界〔恋愛〕", "pink"]
+      : genre === 201
+      ? ["ハイファンタジー〔ファンタジー〕", "cyan"]
+      : genre === 202
+      ? ["ローファンタジー〔ファンタジー〕", "cyan"]
+      : genre === 301
+      ? ["純文学〔文芸〕", "orange"]
+      : genre === 302
+      ? ["ヒューマンドラマ〔文芸〕", "orange"]
+      : genre === 303
+      ? ["歴史〔文芸〕", "orange"]
+      : genre === 304
+      ? ["推理〔文芸〕", "orange"]
+      : genre === 305
+      ? ["ホラー〔文芸〕", "orange"]
+      : genre === 306
+      ? ["アクション〔文芸〕", "orange"]
+      : genre === 307
+      ? ["コメディー〔文芸〕", "orange"]
+      : genre === 401
+      ? ["VRゲーム〔SF〕", "purple"]
+      : genre === 402
+      ? ["宇宙〔SF〕", "purple"]
+      : genre === 403
+      ? ["空想科学〔SF〕", "purple"]
+      : genre === 404
+      ? ["パニック〔SF〕", "purple"]
+      : genre === 9901
+      ? ["童話〔その他〕", "gray"]
+      : genre === 9902
+      ? ["詩〔その他〕", "gray"]
+      : genre === 9903
+      ? ["エッセイ〔その他〕", "gray"]
+      : genre === 9904
+      ? ["リプレイ〔その他〕", "gray"]
+      : genre === 9999
+      ? ["その他〔その他〕", "blackAlpha"]
+      : ["ノンジャンル〔ノンジャンル〕", "blackAlpha"];
+  };
+
   return (
-    <div className="container">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <>
+      <Tabs size="md" variant="enclosed">
+        <TabList>
+          <Tab>更新された作品</Tab>
+          <Tab onClick={() => bookList}>なろうランキング</Tab>
+          <Tab>作品検索</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <p>登録された作品の更新日をここにいれるよ</p>
+            <p>※未実装</p>
+          </TabPanel>
+          <TabPanel>
+            <Container>
+              <VStack>
+                {rankingDataList.map((rd, i) => {
+                  return (
+                    <Box
+                      key={i}
+                      borderWidth="1px"
+                      borderRadius="lg"
+                      padding="2"
+                    >
+                      <HStack>
+                        <Box
+                          display="flex"
+                          alignSelf="flex-start"
+                          whiteSpace="nowrap"
+                        >
+                          {i + 1}位
+                        </Box>
+                        {Array.isArray(rd) ? (
+                          <Box>
+                            <HStack py={1} mb={1}>
+                              <Badge
+                                borderRadius="full"
+                                px="2"
+                                colorScheme={
+                                  bookType(rd[1].end, rd[1].novel_type)[1]
+                                }
+                              >
+                                {bookType(rd[1].end, rd[1].novel_type)[0]}
+                                (全{rd[1].general_all_no}話)
+                              </Badge>
+                              {rd[1].isstop === 1 ? "<長期連載停止中>" : ""}
+                              <Badge
+                                borderRadius="full"
+                                px="2"
+                                colorScheme={nGenre(rd[1].genre)[1]}
+                              >
+                                {nGenre(rd[1].genre)[0]}
+                              </Badge>
+                            </HStack>
+                            <Link
+                              href={`https://ncode.syosetu.com/${rd[1].ncode}`}
+                              isExternal
+                              color={"blue.500"}
+                              fontWeight="semibold"
+                            >
+                              {rd[1].title}
+                            </Link>
 
-      <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+                            <HStack spacing={8} py={3}>
+                              <Box fontSize={"sm"} noOfLines={10}>
+                                {rd[1].story}
+                              </Box>
+                            </HStack>
 
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{" "}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
-      </footer>
-
-      <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer img {
-          margin-left: 0.5rem;
-        }
-
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
-
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
-
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
-
-        .title,
-        .description {
-          text-align: center;
-        }
-
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
-        }
-
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
-
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
-
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
-
-        .logo {
-          height: 1em;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
-          }
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
+                            <Box fontSize={"smaller"} fontFamily="-moz-initial">
+                              最終投稿日：{rd[1].general_lastup}
+                            </Box>
+                            <Box fontSize={"smaller"} fontFamily="-moz-initial">
+                              最終更新日：{rd[1].novelupdated_at}
+                            </Box>
+                          </Box>
+                        ) : (
+                          <>
+                            <Box>タイトルを取得できませんでした</Box>
+                          </>
+                        )}
+                      </HStack>
+                    </Box>
+                  );
+                })}
+              </VStack>
+            </Container>
+          </TabPanel>
+          <TabPanel>
+            <p>作品の検索をするよ</p>
+            <p>※未実装</p>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </>
   );
 }
