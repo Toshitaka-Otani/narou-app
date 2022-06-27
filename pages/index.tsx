@@ -41,56 +41,58 @@ export default function App(): JSX.Element {
     }
   }, [monthRank]);
 
-  const bookType = (end: number, novel_type: number) => {
+  const nobelType = (end: number, novel_type: number) => {
     if (end) {
-      return ["連載中", "teal"];
+      return { type: "連載中", color: "teal" };
     } else {
-      return novel_type === 2 ? ["短編", "yellow"] : ["完結済", "blackAlpha"];
+      return novel_type === 2
+        ? { type: "短編", color: "yellow" }
+        : { type: "完結済", color: "blackAlpha" };
     }
   };
 
   const nGenre = (genre: number) => {
     return genre === 101
-      ? ["異世界〔恋愛〕", "pink"]
+      ? { type: "異世界〔恋愛〕", color: "pink" }
       : genre === 102
-      ? ["現実世界〔恋愛〕", "pink"]
+      ? { type: "現実世界〔恋愛〕", color: "pink" }
       : genre === 201
-      ? ["ハイファンタジー〔ファンタジー〕", "cyan"]
+      ? { type: "ハイファンタジー〔ファンタジー〕", color: "cyan" }
       : genre === 202
-      ? ["ローファンタジー〔ファンタジー〕", "cyan"]
+      ? { type: "ローファンタジー〔ファンタジー〕", color: "cyan" }
       : genre === 301
-      ? ["純文学〔文芸〕", "orange"]
+      ? { type: "純文学〔文芸〕", color: "orange" }
       : genre === 302
-      ? ["ヒューマンドラマ〔文芸〕", "orange"]
+      ? { type: "ヒューマンドラマ〔文芸〕", color: "orange" }
       : genre === 303
-      ? ["歴史〔文芸〕", "orange"]
+      ? { type: "歴史〔文芸〕", color: "orange" }
       : genre === 304
-      ? ["推理〔文芸〕", "orange"]
+      ? { type: "推理〔文芸〕", color: "orange" }
       : genre === 305
-      ? ["ホラー〔文芸〕", "orange"]
+      ? { type: "ホラー〔文芸〕", color: "orange" }
       : genre === 306
-      ? ["アクション〔文芸〕", "orange"]
+      ? { type: "アクション〔文芸〕", color: "orange" }
       : genre === 307
-      ? ["コメディー〔文芸〕", "orange"]
+      ? { type: "コメディー〔文芸〕", color: "orange" }
       : genre === 401
-      ? ["VRゲーム〔SF〕", "purple"]
+      ? { type: "VRゲーム〔SF〕", color: "purple" }
       : genre === 402
-      ? ["宇宙〔SF〕", "purple"]
+      ? { type: "宇宙〔SF〕", color: "purple" }
       : genre === 403
-      ? ["空想科学〔SF〕", "purple"]
+      ? { type: "空想科学〔SF〕", color: "purple" }
       : genre === 404
-      ? ["パニック〔SF〕", "purple"]
+      ? { type: "パニック〔SF〕", color: "purple" }
       : genre === 9901
-      ? ["童話〔その他〕", "gray"]
+      ? { type: "童話〔その他〕", color: "gray" }
       : genre === 9902
-      ? ["詩〔その他〕", "gray"]
+      ? { type: "詩〔その他〕", color: "gray" }
       : genre === 9903
-      ? ["エッセイ〔その他〕", "gray"]
+      ? { type: "エッセイ〔その他〕", color: "gray" }
       : genre === 9904
-      ? ["リプレイ〔その他〕", "gray"]
+      ? { type: "リプレイ〔その他〕", color: "gray" }
       : genre === 9999
-      ? ["その他〔その他〕", "blackAlpha"]
-      : ["ノンジャンル〔ノンジャンル〕", "blackAlpha"];
+      ? { type: "その他〔その他〕", color: "blackAlpha" }
+      : { type: "ノンジャンル〔ノンジャンル〕", color: "blackAlpha" };
   };
 
   return (
@@ -132,19 +134,19 @@ export default function App(): JSX.Element {
                                 borderRadius="full"
                                 px="2"
                                 colorScheme={
-                                  bookType(rd[1].end, rd[1].novel_type)[1]
+                                  nobelType(rd[1].end, rd[1].novel_type).color
                                 }
                               >
-                                {bookType(rd[1].end, rd[1].novel_type)[0]}
+                                {nobelType(rd[1].end, rd[1].novel_type).type}
                                 (全{rd[1].general_all_no}話)
                               </Badge>
                               {rd[1].isstop === 1 ? "<長期連載停止中>" : ""}
                               <Badge
                                 borderRadius="full"
                                 px="2"
-                                colorScheme={nGenre(rd[1].genre)[1]}
+                                colorScheme={nGenre(rd[1].genre).color}
                               >
-                                {nGenre(rd[1].genre)[0]}
+                                {nGenre(rd[1].genre).type}
                               </Badge>
                             </HStack>
                             <Link
