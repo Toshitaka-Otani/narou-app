@@ -51,48 +51,42 @@ export default function App(): JSX.Element {
     }
   };
 
-  const nGenre = (genre: number) => {
-    return genre === 101
-      ? { type: "異世界〔恋愛〕", color: "pink" }
-      : genre === 102
-      ? { type: "現実世界〔恋愛〕", color: "pink" }
-      : genre === 201
-      ? { type: "ハイファンタジー〔ファンタジー〕", color: "cyan" }
-      : genre === 202
-      ? { type: "ローファンタジー〔ファンタジー〕", color: "cyan" }
-      : genre === 301
-      ? { type: "純文学〔文芸〕", color: "orange" }
-      : genre === 302
-      ? { type: "ヒューマンドラマ〔文芸〕", color: "orange" }
-      : genre === 303
-      ? { type: "歴史〔文芸〕", color: "orange" }
-      : genre === 304
-      ? { type: "推理〔文芸〕", color: "orange" }
-      : genre === 305
-      ? { type: "ホラー〔文芸〕", color: "orange" }
-      : genre === 306
-      ? { type: "アクション〔文芸〕", color: "orange" }
-      : genre === 307
-      ? { type: "コメディー〔文芸〕", color: "orange" }
-      : genre === 401
-      ? { type: "VRゲーム〔SF〕", color: "purple" }
-      : genre === 402
-      ? { type: "宇宙〔SF〕", color: "purple" }
-      : genre === 403
-      ? { type: "空想科学〔SF〕", color: "purple" }
-      : genre === 404
-      ? { type: "パニック〔SF〕", color: "purple" }
-      : genre === 9901
-      ? { type: "童話〔その他〕", color: "gray" }
-      : genre === 9902
-      ? { type: "詩〔その他〕", color: "gray" }
-      : genre === 9903
-      ? { type: "エッセイ〔その他〕", color: "gray" }
-      : genre === 9904
-      ? { type: "リプレイ〔その他〕", color: "gray" }
-      : genre === 9999
-      ? { type: "その他〔その他〕", color: "blackAlpha" }
-      : { type: "ノンジャンル〔ノンジャンル〕", color: "blackAlpha" };
+  const nGenreColor = (genre: number) => {
+    return genre === (101 || 102)
+      ? "pink"
+      : genre === (201 || 202)
+      ? "cyan"
+      : genre === (301 || 302 || 303 || 304 || 305 || 306 || 307)
+      ? "orange"
+      : genre === (401 || 402 || 403 || 404)
+      ? "purple"
+      : genre === (9901 || 9902 || 9903 || 9904)
+      ? "gray"
+      : "blackAlpha";
+  };
+
+  const nGenre: { [key: number]: string } = {
+    101: "異世界〔恋愛〕",
+    102: "現実世界〔恋愛〕",
+    201: "ハイファンタジー〔ファンタジー〕",
+    202: "ローファンタジー〔ファンタジー〕",
+    301: "純文学〔文芸〕",
+    302: "ヒューマンドラマ〔文芸〕",
+    303: "歴史〔文芸〕",
+    304: "推理〔文芸〕",
+    305: "ホラー〔文芸〕",
+    306: "アクション〔文芸〕",
+    307: "コメディー〔文芸〕",
+    401: "VRゲーム〔SF〕",
+    402: "宇宙〔SF〕",
+    403: "空想科学〔SF〕",
+    404: "パニック〔SF〕",
+    9901: "童話〔その他〕",
+    9902: "詩〔その他〕",
+    9903: "エッセイ〔その他〕",
+    9904: "リプレイ〔その他〕",
+    9999: "その他〔その他〕",
+    9801: "ノンジャンル〔ノンジャンル〕",
   };
 
   return (
@@ -144,9 +138,9 @@ export default function App(): JSX.Element {
                               <Badge
                                 borderRadius="full"
                                 px="2"
-                                colorScheme={nGenre(rd[1].genre).color}
+                                colorScheme={nGenreColor(rd[1].genre)}
                               >
-                                {nGenre(rd[1].genre).type}
+                                {nGenre[rd[1].genre]}
                               </Badge>
                             </HStack>
                             <Link
