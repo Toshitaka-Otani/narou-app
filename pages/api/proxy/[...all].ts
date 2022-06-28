@@ -6,7 +6,7 @@ export default (req: NextApiRequest, res: NextApiResponse): Promise<any> =>
     target: `https://api.syosetu.com`,
     pathRewrite: [
       {
-        patternStr: "^/api/proxy",
+        patternStr: process.env.NODE_ENV ? "^/api/proxy" : "",
         replaceStr: "",
       },
     ],
