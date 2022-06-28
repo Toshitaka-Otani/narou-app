@@ -12,6 +12,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React, { useEffect, useMemo, useState } from "react";
+import { DrawerExample } from "../components/Drawer";
 import { getBookList } from "../repository/api/rank";
 
 export default function App(): JSX.Element {
@@ -107,6 +108,7 @@ export default function App(): JSX.Element {
           <TabPanel>
             <p>登録された作品の更新日をここにいれるよ</p>
             <p>※未実装</p>
+            <DrawerExample/>
           </TabPanel>
           <TabPanel>
             <Container>
