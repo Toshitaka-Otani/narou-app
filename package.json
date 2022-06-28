@@ -21,7 +21,8 @@
     "next": "^12.1.6",
     "next-http-proxy-middleware": "^1.2.4",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "react-icons": "^4.4.0"
   },
   "devDependencies": {
     "@types/node": "^14.14.37",
