@@ -1,6 +1,8 @@
 import axios from "../../axios";
 
-export const getBookList = async (param: string) => {
+export const getBookList = async (
+  param: string
+): Promise<string | (string | NarouBook)[]> => {
   const res: [] | string = await axios
     .get(`/api/proxy/${param}`)
     .then((res) => {
@@ -26,7 +28,9 @@ export const getBookList = async (param: string) => {
   }
 };
 
-export const getBookData = async (rankData: Ranking) => {
+export const getBookData = async (
+  rankData: Ranking
+): Promise<string | NarouBook> => {
   return await axios
     .get(`/api/proxy/novelapi/api?out=json&ncode=${rankData.ncode}`)
     .then((res) => {
