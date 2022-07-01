@@ -92,7 +92,6 @@ export default function App(): JSX.Element {
 
   return (
     <>
-    <SimpleSidebar>
       <Tabs size="md" variant="enclosed">
         <TabList>
           <Tab>更新された作品</Tab>
@@ -103,7 +102,6 @@ export default function App(): JSX.Element {
           <TabPanel>
             <p>登録された作品の更新日をここにいれるよ</p>
             <p>※未実装</p>
-            
           </TabPanel>
           <TabPanel>
             <Container>
@@ -186,7 +184,6 @@ export default function App(): JSX.Element {
           </TabPanel>
         </TabPanels>
       </Tabs>
-      </SimpleSidebar>
     </>
   );
 }
