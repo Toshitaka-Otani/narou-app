@@ -1,13 +1,16 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { AppProps } from "next/app";
 import React from "react";
+import { SimpleSidebar } from "../components/sidebar";
 import { Layout } from "../components/Layout";
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <ChakraProvider>
       <Layout>
-        <Component {...pageProps} />
+        <SimpleSidebar>
+          <Component {...pageProps} />
+        </SimpleSidebar>
       </Layout>
     </ChakraProvider>
   );
