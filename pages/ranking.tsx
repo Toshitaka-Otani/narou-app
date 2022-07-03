@@ -1,87 +1,31 @@
-import { Badge, Box, Container, HStack, Link, VStack } from "@chakra-ui/react";
-import React, { useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
-import { readBuilderProgram } from "typescript";
+import {
+  Badge,
+  Box,
+  Container,
+  HStack,
+  Link,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  VStack,
+} from "@chakra-ui/react";
+import React from "react";
 import axios from "../axios";
-import { getBookList } from "../repository/api/rank";
 import useSWRImmutable from "swr/immutable";
 
 export default function App(): JSX.Element {
-  const [monthRank, setMonthRank] = useState<string>("");
-  const [rankingDataList, setRankingDataList] = useState<
-    (NarouBook | string)[]
-  >([]);
-
-  const RankingList = () => {
-    const fetcher = (url: string) => axios.get(url).then((res) => res.data);
-    const { data, error } = useSWRImmutable(
-      `/api/proxy/novelapi/api?out=json&order=monthlypoint&lim=15`,
-      fetcher
-    );
-    if (error) return <div>failed to load</div>;
-    if (!data) return <div>loading...</div>;
-    return data.map((rd: NarouBook, i: number) => {
-      if (i === 0) return <div key={i}></div>;
-      return (
-        <Box key={i} borderWidth="1px" borderRadius="lg" padding="2">
-          <HStack>
-            <Box display="flex" alignSelf="flex-start" whiteSpace="nowrap">
-              {i}位
-            </Box>
-            <Box>
-              <HStack py={1} mb={1}>
-                <Badge
-                  borderRadius="full"
-                  px="2"
-                  colorScheme={nobelType(rd.end, rd.novel_type).color}
-                >
-                  {nobelType(rd.end, rd.novel_type).type}
-                  (全{rd.general_all_no}話)
-                </Badge>
-                {rd.isstop === 1 ? "<長期連載停止中>" : ""}
-                <Badge
-                  borderRadius="full"
-                  px="2"
-                  colorScheme={nGenreColor(rd.genre)}
-                >
-                  {nGenre[rd.genre]}
-                </Badge>
-              </HStack>
-              <Link
-                href={`https://ncode.syosetu.com/${rd.ncode}`}
-                isExternal
-                color={"blue.500"}
-                fontWeight="semibold"
-              >
-                {rd.title}
-              </Link>
-
-              <HStack spacing={8} py={3}>
-                <Box fontSize={"sm"} noOfLines={10}>
-                  {rd.story}
-                </Box>
-              </HStack>
-
-              <Box fontSize={"smaller"} fontFamily="-moz-initial">
-                最終投稿日：{rd.general_lastup}
-              </Box>
-              <Box fontSize={"smaller"} fontFamily="-moz-initial">
-                最終更新日：{rd.novelupdated_at}
-              </Box>
-            </Box>
-          </HStack>
-        </Box>
-      );
-    });
-  };
-
-  const nobelType = (end: number, novel_type: number) => {
+  const nobelType = (end: number, novel_type: number, is_stop: number) => {
+    if (is_stop) {
+      return { nobel_type: "長期連載停止中", nobel_color: "gray" };
+    }
     if (end) {
-      return { type: "連載中", color: "teal" };
+      return { nobel_type: "連載中", nobel_color: "teal" };
     } else {
       return novel_type === 2
-        ? { type: "短編", color: "yellow" }
-        : { type: "完結済", color: "blackAlpha" };
+        ? { nobel_type: "短編", nobel_color: "yellow" }
+        : { nobel_type: "完結済", nobel_color: "blackAlpha" };
     }
   };
 
@@ -123,13 +67,92 @@ export default function App(): JSX.Element {
     9801: "ノンジャンル〔ノンジャンル〕",
   };
 
+  const bigGenre = ["", "2", "1", "4", "3-99-98"];
+
+  const RankingList = (props: { bg: string }): JSX.Element => {
+    const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+    console.log(props);
+    const { data, error } = useSWRImmutable(
+      `/api/proxy/novelapi/api?out=json&lim=100&order=monthlypoint&biggenre=${props.bg}`,
+      fetcher
+    );
+    if (error) return <div>failed to load</div>;
+    if (!data) return <div>loading...</div>;
+    return data.map((narouData: NarouBook, i: number) => {
+      if (i === 0) return <div key={i}></div>;
+      const { nobel_color, nobel_type } = nobelType(
+        narouData.end,
+        narouData.novel_type,
+        narouData.isstop
+      );
+      return (
+        <Box key={i} borderWidth="1px" borderRadius="lg" padding="2">
+          <HStack>
+            <Box display="flex" alignSelf="flex-start" whiteSpace="nowrap">
+              {i}位
+            </Box>
+            <Box>
+              <HStack py={1} mb={1}>
+                <Badge borderRadius="full" px="2" colorScheme={nobel_color}>
+                  {nobel_type}
+                  (全{narouData.general_all_no}話)
+                </Badge>
+                <Badge
+                  borderRadius="full"
+                  px="2"
+                  colorScheme={nGenreColor(narouData.genre)}
+                >
+                  {nGenre[narouData.genre]}
+                </Badge>
+              </HStack>
+              <Link
+                href={`https://ncode.syosetu.com/${narouData.ncode}`}
+                isExternal
+                color={"blue.500"}
+                fontWeight="semibold"
+              >
+                {narouData.title}
+              </Link>
+              <HStack spacing={8} py={3}>
+                <Box fontSize={"sm"} noOfLines={10}>
+                  {narouData.story}
+                </Box>
+              </HStack>
+              <Box fontSize={"smaller"} fontFamily="-moz-initial">
+                最終投稿日：{narouData.general_lastup}
+              </Box>
+              <Box fontSize={"smaller"} fontFamily="-moz-initial">
+                最終更新日：{narouData.novelupdated_at}
+              </Box>
+            </Box>
+          </HStack>
+        </Box>
+      );
+    });
+  };
+
   return (
-    <>
-      <Container>
-        <VStack>
-          <RankingList />
-        </VStack>
-      </Container>
-    </>
+    <Container>
+      <Tabs>
+        <TabList>
+          <Tab>総合</Tab>
+          <Tab>ファンタジー</Tab>
+          <Tab>恋愛</Tab>
+          <Tab>SF</Tab>
+          <Tab>その他</Tab>
+        </TabList>
+        <TabPanels>
+          {bigGenre.map((bg, i) => {
+            return (
+              <TabPanel key={i}>
+                <VStack>
+                  <RankingList bg={bg} />
+                </VStack>
+              </TabPanel>
+            );
+          })}
+        </TabPanels>
+      </Tabs>
+    </Container>
   );
 }
