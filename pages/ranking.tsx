@@ -1,7 +1,12 @@
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Container,
   HStack,
+  Spinner,
   Tab,
   TabList,
   TabPanel,
@@ -14,7 +19,7 @@ import axios from "../axios";
 import useSWRImmutable from "swr/immutable";
 import { BookData } from "../components/BookData";
 
-export default function App(): JSX.Element {
+export default function Ranking(): JSX.Element {
   const tabCategoryParam = [
     { category: "総合", param: "" },
     { category: "異世界転移・転生", param: "&istt=1" },
@@ -33,8 +38,27 @@ export default function App(): JSX.Element {
       `/api/proxy/novelapi/api?out=json&lim=100&order=monthlypoint${param}&of=t-n-u-w-s-bg-g-gl-nt-ga-e-i-iti-mp-nu`,
       fetcher
     );
-    if (error) return <div>failed to load</div>;
-    if (!data) return <div>loading...</div>;
+    if (error)
+      return (
+        <Alert status="error">
+          <AlertIcon />
+          <AlertTitle>データの取得に失敗しました。</AlertTitle>
+          <AlertDescription>ページを更新してください。</AlertDescription>
+        </Alert>
+      );
+    if (!data)
+      return (
+        <div>
+          <Spinner
+            thickness="4px"
+            speed="1s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+          />
+          <div>loading...</div>
+        </div>
+      );
     return data.map((narouData: NarouBookData, i: number) => {
       if (i === 0) return <div key={i}></div>;
       return (
