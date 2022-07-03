@@ -1,6 +1,10 @@
 import { Badge, Box, Container, HStack, Link, VStack } from "@chakra-ui/react";
 import React, { useEffect, useMemo, useState } from "react";
+import useSWR from "swr";
+import { readBuilderProgram } from "typescript";
+import axios from "../axios";
 import { getBookList } from "../repository/api/rank";
+import useSWRImmutable from "swr/immutable";
 
 export default function App(): JSX.Element {
   const [monthRank, setMonthRank] = useState<string>("");
@@ -8,27 +12,68 @@ export default function App(): JSX.Element {
     (NarouBook | string)[]
   >([]);
 
-  useEffect(() => {
-    const d = new Date();
-    const strYear = String(d.getFullYear());
-    const month = d.getMonth() + 1;
-    const strMonth = month < 10 ? "0" + String(month) : String(month);
-    setMonthRank(strYear + strMonth + "01-m");
-    bookList;
-  }, []);
+  const RankingList = () => {
+    const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+    const { data, error } = useSWRImmutable(
+      `/api/proxy/novelapi/api?out=json&order=monthlypoint&lim=15`,
+      fetcher
+    );
+    if (error) return <div>failed to load</div>;
+    if (!data) return <div>loading...</div>;
+    return data.map((rd: NarouBook, i: number) => {
+      if (i === 0) return <div key={i}></div>;
+      return (
+        <Box key={i} borderWidth="1px" borderRadius="lg" padding="2">
+          <HStack>
+            <Box display="flex" alignSelf="flex-start" whiteSpace="nowrap">
+              {i}位
+            </Box>
+            <Box>
+              <HStack py={1} mb={1}>
+                <Badge
+                  borderRadius="full"
+                  px="2"
+                  colorScheme={nobelType(rd.end, rd.novel_type).color}
+                >
+                  {nobelType(rd.end, rd.novel_type).type}
+                  (全{rd.general_all_no}話)
+                </Badge>
+                {rd.isstop === 1 ? "<長期連載停止中>" : ""}
+                <Badge
+                  borderRadius="full"
+                  px="2"
+                  colorScheme={nGenreColor(rd.genre)}
+                >
+                  {nGenre[rd.genre]}
+                </Badge>
+              </HStack>
+              <Link
+                href={`https://ncode.syosetu.com/${rd.ncode}`}
+                isExternal
+                color={"blue.500"}
+                fontWeight="semibold"
+              >
+                {rd.title}
+              </Link>
 
-  const bookList = useMemo(async () => {
-    try {
-      const response: string | (NarouBook | string)[] = await getBookList(
-        `rank/rankget/?out=json&rtype=${monthRank}`
+              <HStack spacing={8} py={3}>
+                <Box fontSize={"sm"} noOfLines={10}>
+                  {rd.story}
+                </Box>
+              </HStack>
+
+              <Box fontSize={"smaller"} fontFamily="-moz-initial">
+                最終投稿日：{rd.general_lastup}
+              </Box>
+              <Box fontSize={"smaller"} fontFamily="-moz-initial">
+                最終更新日：{rd.novelupdated_at}
+              </Box>
+            </Box>
+          </HStack>
+        </Box>
       );
-      if (Array.isArray(response)) {
-        setRankingDataList(response);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  }, [monthRank]);
+    });
+  };
 
   const nobelType = (end: number, novel_type: number) => {
     if (end) {
@@ -82,70 +127,7 @@ export default function App(): JSX.Element {
     <>
       <Container>
         <VStack>
-          {rankingDataList.map((rd, i) => {
-            return (
-              <Box key={i} borderWidth="1px" borderRadius="lg" padding="2">
-                <HStack>
-                  <Box
-                    display="flex"
-                    alignSelf="flex-start"
-                    whiteSpace="nowrap"
-                  >
-                    {i + 1}位
-                  </Box>
-                  {Array.isArray(rd) ? (
-                    <Box>
-                      <HStack py={1} mb={1}>
-                        <Badge
-                          borderRadius="full"
-                          px="2"
-                          colorScheme={
-                            nobelType(rd[1].end, rd[1].novel_type).color
-                          }
-                        >
-                          {nobelType(rd[1].end, rd[1].novel_type).type}
-                          (全{rd[1].general_all_no}話)
-                        </Badge>
-                        {rd[1].isstop === 1 ? "<長期連載停止中>" : ""}
-                        <Badge
-                          borderRadius="full"
-                          px="2"
-                          colorScheme={nGenreColor(rd[1].genre)}
-                        >
-                          {nGenre[rd[1].genre]}
-                        </Badge>
-                      </HStack>
-                      <Link
-                        href={`https://ncode.syosetu.com/${rd[1].ncode}`}
-                        isExternal
-                        color={"blue.500"}
-                        fontWeight="semibold"
-                      >
-                        {rd[1].title}
-                      </Link>
-
-                      <HStack spacing={8} py={3}>
-                        <Box fontSize={"sm"} noOfLines={10}>
-                          {rd[1].story}
-                        </Box>
-                      </HStack>
-
-                      <Box fontSize={"smaller"} fontFamily="-moz-initial">
-                        最終投稿日：{rd[1].general_lastup}
-                      </Box>
-                      <Box fontSize={"smaller"} fontFamily="-moz-initial">
-                        最終更新日：{rd[1].novelupdated_at}
-                      </Box>
-                    </Box>
-                  ) : (
-                    <>
-                      <Box>タイトルを取得できませんでした</Box>
-                    </>
-                  )}
-                </HStack>
-              </Box>
-            );
-          })}
+          <RankingList />
         </VStack>
       </Container>
     </>

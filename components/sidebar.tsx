@@ -17,6 +17,7 @@ import {
 import { FiHome, FiTrendingUp, FiCompass, FiMenu } from "react-icons/fi";
 import { IconType } from "react-icons";
 import { ReactText } from "react";
+import { useRouter } from "next/router";
 
 interface LinkItemProps {
   name: string;
@@ -99,9 +100,10 @@ interface NavItemProps extends FlexProps {
   href: string;
 }
 const NavItem = ({ icon, href, children, ...rest }: NavItemProps) => {
+  const router = useRouter();
   return (
     <Link
-      href={href}
+      onClick={() => router.push(href)}
       style={{ textDecoration: "none" }}
       _focus={{ boxShadow: "none" }}
     >
