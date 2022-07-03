@@ -26,7 +26,7 @@ interface LinkItemProps {
 }
 const LinkItems: Array<LinkItemProps> = [
   { name: "更新された作品", icon: FiHome, href: "/" },
-  { name: "なろうランキング", icon: FiTrendingUp, href: "/ranking" },
+  { name: "月間ランキング", icon: FiTrendingUp, href: "/ranking" },
   { name: "作品検索", icon: FiCompass, href: "#" },
 ];
 
@@ -81,7 +81,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          {/* Logo */}
+          なろうAPP
         </Text>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
@@ -158,9 +158,8 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         aria-label="open menu"
         icon={<FiMenu />}
       />
-
       <Text fontSize="2xl" ml="8" fontFamily="monospace" fontWeight="bold">
-        Logo
+        なろうAPP
       </Text>
     </Flex>
   );
