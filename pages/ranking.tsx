@@ -4,6 +4,7 @@ import {
   AlertIcon,
   AlertTitle,
   Box,
+  Center,
   Container,
   HStack,
   Spinner,
@@ -48,7 +49,7 @@ export default function Ranking(): JSX.Element {
       );
     if (!data)
       return (
-        <div>
+        <Center>
           <Spinner
             thickness="4px"
             speed="1s"
@@ -57,7 +58,7 @@ export default function Ranking(): JSX.Element {
             size="xl"
           />
           <div>loading...</div>
-        </div>
+        </Center>
       );
     return data.map((narouData: NarouBookData, i: number) => {
       if (i === 0) return <div key={i}></div>;
@@ -75,29 +76,31 @@ export default function Ranking(): JSX.Element {
   };
 
   return (
-    <Container>
-      <Tabs isFitted variant="enclosed">
-        <TabList>
-          {tabCategoryParam.map((cp, i) => {
-            return (
-              <Box key={i}>
-                <Tab>{cp.category}</Tab>
-              </Box>
-            );
-          })}
-        </TabList>
-        <TabPanels>
-          {tabCategoryParam.map((cp, i) => {
-            return (
-              <TabPanel key={i}>
-                <VStack>
-                  <RankingList param={cp.param} />
-                </VStack>
-              </TabPanel>
-            );
-          })}
-        </TabPanels>
-      </Tabs>
-    </Container>
+    <Center>
+      <Box maxW={{ base: "full", md: "container.sm" }}>
+        <Tabs isFitted variant="enclosed">
+          <TabList>
+            {tabCategoryParam.map((cp, i) => {
+              return (
+                <Box key={i}>
+                  <Tab>{cp.category}</Tab>
+                </Box>
+              );
+            })}
+          </TabList>
+          <TabPanels>
+            {tabCategoryParam.map((cp, i) => {
+              return (
+                <TabPanel key={i}>
+                  <VStack>
+                    <RankingList param={cp.param} />
+                  </VStack>
+                </TabPanel>
+              );
+            })}
+          </TabPanels>
+        </Tabs>
+      </Box>
+    </Center>
   );
 }

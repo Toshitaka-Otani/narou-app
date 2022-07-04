@@ -10,24 +10,33 @@ import {
   Input,
   Checkbox,
   Stack,
+  Button,
+  Flex,
+  Center,
 } from "@chakra-ui/react";
 import axios from "../axios";
-import React from "react";
+import React, { useState } from "react";
 import { BookData } from "../components/BookData";
 import useSWRImmutable from "swr/immutable";
 
 export default function Search(): JSX.Element {
-  const handleChange = (event: { target: { value: string } }) =>
-    console.log(event.target.value, "aaaa");
   const [checkedItems, setCheckedItems] = React.useState([
     false,
     false,
     false,
     false,
   ]);
-
+  const [searchText, setSearchText] = useState<string>("");
   const allChecked = checkedItems.every(Boolean);
   const isIndeterminate = checkedItems.some(Boolean) && !allChecked;
+
+  const handleChange = (event: { target: { value: string } }) =>
+    setSearchText(event.target.value);
+
+  const bookSearch = () => {
+    console.log(searchText);
+    console.log(checkedItems);
+  };
 
   const RankingList = (): JSX.Element => {
     const fetcher = (url: string) => axios.get(url).then((res) => res.data);
@@ -45,7 +54,7 @@ export default function Search(): JSX.Element {
       );
     if (!data)
       return (
-        <div>
+        <Center>
           <Spinner
             thickness="4px"
             speed="1s"
@@ -54,15 +63,13 @@ export default function Search(): JSX.Element {
             size="xl"
           />
           <div>loading...</div>
-        </div>
+        </Center>
       );
     return data.map((narouData: NarouBookData, i: number) => {
       if (i === 0) return <div key={i}></div>;
       return (
-        <Box key={i} borderWidth="1px" borderRadius="lg" padding="2">
-          <HStack>
-            <BookData narouData={narouData} />
-          </HStack>
+        <Box key={i} borderWidth="1px" borderRadius="lg" p="2">
+          <BookData narouData={narouData} />
         </Box>
       );
     });
@@ -70,50 +77,68 @@ export default function Search(): JSX.Element {
 
   return (
     <>
-      <Input onChange={handleChange} placeholder="Basic usage" />
-      <Checkbox
-        isChecked={allChecked}
-        isIndeterminate={isIndeterminate}
-        onChange={(e) =>
-          setCheckedItems([
-            e.target.checked,
-            e.target.checked,
-            e.target.checked,
-            e.target.checked,
-          ])
-        }
-      >
-        すべて選択
-      </Checkbox>
-      <Stack pl={6} mt={1} spacing={1}>
-        <Checkbox
-          isChecked={checkedItems[0]}
-          onChange={(e) => setCheckedItems([e.target.checked, checkedItems[1]])}
+      <Box display={{ md: "flex" }}>
+        <Box mb={{ base: 50 }}>
+          <HStack spacing={8} mb={5}>
+            <Input onChange={handleChange} placeholder="Basic usage" />
+            <Button onClick={() => bookSearch()}>here</Button>
+          </HStack>
+          <Checkbox
+            isChecked={allChecked}
+            isIndeterminate={isIndeterminate}
+            onChange={(e) =>
+              setCheckedItems([
+                e.target.checked,
+                e.target.checked,
+                e.target.checked,
+                e.target.checked,
+              ])
+            }
+          >
+            すべて選択
+          </Checkbox>
+          <Stack pl={6} mt={1} spacing={1}>
+            <Checkbox
+              isChecked={checkedItems[0]}
+              onChange={(e) =>
+                setCheckedItems([e.target.checked, checkedItems[1]])
+              }
+            >
+              タイトル
+            </Checkbox>
+            <Checkbox
+              isChecked={checkedItems[1]}
+              onChange={(e) =>
+                setCheckedItems([checkedItems[0], e.target.checked])
+              }
+            >
+              あらすじ
+            </Checkbox>
+            <Checkbox
+              isChecked={checkedItems[2]}
+              onChange={(e) =>
+                setCheckedItems([checkedItems[2], e.target.checked])
+              }
+            >
+              キーワード
+            </Checkbox>
+            <Checkbox
+              isChecked={checkedItems[3]}
+              onChange={(e) =>
+                setCheckedItems([checkedItems[3], e.target.checked])
+              }
+            >
+              作者名
+            </Checkbox>
+          </Stack>
+        </Box>
+        <Box
+          justifyContent={{ md: "center" }}
+          w={{ base: "full", md: "container.sm" }}
         >
-          タイトル
-        </Checkbox>
-        <Checkbox
-          isChecked={checkedItems[1]}
-          onChange={(e) => setCheckedItems([checkedItems[0], e.target.checked])}
-        >
-          あらすじ
-        </Checkbox>
-        <Checkbox
-          isChecked={checkedItems[2]}
-          onChange={(e) => setCheckedItems([checkedItems[2], e.target.checked])}
-        >
-          キーワード
-        </Checkbox>
-        <Checkbox
-          isChecked={checkedItems[3]}
-          onChange={(e) => setCheckedItems([checkedItems[3], e.target.checked])}
-        >
-          作者名
-        </Checkbox>
-      </Stack>
-      <Container>
-        <RankingList />
-      </Container>
+          <RankingList />
+        </Box>
+      </Box>
     </>
   );
 }
