@@ -5,14 +5,12 @@ import {
   AlertDescription,
   Spinner,
   Box,
-  HStack,
-  Container,
   Input,
   Checkbox,
   Stack,
   Button,
-  Flex,
   Center,
+  Text,
 } from "@chakra-ui/react";
 import axios from "../axios";
 import React, { useState } from "react";
@@ -20,7 +18,7 @@ import { BookData } from "../components/BookData";
 import useSWRImmutable from "swr/immutable";
 
 export default function Search(): JSX.Element {
-  const [checkedItems, setCheckedItems] = React.useState([
+  const [checkedItems, setCheckedItems] = useState([
     false,
     false,
     false,
@@ -79,10 +77,16 @@ export default function Search(): JSX.Element {
     <>
       <Box display={{ md: "flex" }}>
         <Box mb={{ base: 50 }}>
-          <HStack spacing={8} mb={5}>
-            <Input onChange={handleChange} placeholder="Basic usage" />
-            <Button onClick={() => bookSearch()}>here</Button>
-          </HStack>
+          <Stack direction="row" spacing={4} mb={5} mr={{ md: 8 }}>
+            <Box>
+              <Input onChange={handleChange} placeholder="転生　勇者" />
+              <Text fontSize="xs">
+                複数条件で検索する場合はスペースで区切ってください。
+              </Text>
+            </Box>
+            <Button onClick={() => bookSearch()}>検索</Button>
+          </Stack>
+          <Text>検索条件を選択してください</Text>
           <Checkbox
             isChecked={allChecked}
             isIndeterminate={isIndeterminate}
@@ -100,16 +104,16 @@ export default function Search(): JSX.Element {
           <Stack pl={6} mt={1} spacing={1}>
             <Checkbox
               isChecked={checkedItems[0]}
-              onChange={(e) =>
-                setCheckedItems([e.target.checked, checkedItems[1]])
-              }
+              onChange={(e) => {
+                setCheckedItems([checkedItems[0], e.target.checked]);
+              }}
             >
               タイトル
             </Checkbox>
             <Checkbox
               isChecked={checkedItems[1]}
               onChange={(e) =>
-                setCheckedItems([checkedItems[0], e.target.checked])
+                setCheckedItems([checkedItems[1], e.target.checked])
               }
             >
               あらすじ
