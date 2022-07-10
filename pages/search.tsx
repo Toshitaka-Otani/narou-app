@@ -6,43 +6,52 @@ import {
   Spinner,
   Box,
   Input,
-  Checkbox,
   Stack,
-  Button,
   Center,
   Text,
 } from "@chakra-ui/react";
 import axios from "../axios";
 import React, { useState } from "react";
 import { BookData } from "../components/BookData";
-import useSWRImmutable from "swr/immutable";
+import useSWR from "swr";
 
 export default function Search(): JSX.Element {
-  const [checkedItems, setCheckedItems] = useState([
-    false,
-    false,
-    false,
-    false,
-  ]);
+  // const [checkedItems, setCheckedItems] = useState([]);
   const [searchText, setSearchText] = useState<string>("");
-  const allChecked = checkedItems.every(Boolean);
-  const isIndeterminate = checkedItems.some(Boolean) && !allChecked;
+  // const allChecked = checkedItems.every(Boolean);
+  // const isIndeterminate = checkedItems.some(Boolean) && !allChecked;
+  // const searchCategory = ["タイトル", "あらすじ", "キーワード", "作者名"];
 
   const handleChange = (event: { target: { value: string } }) =>
     setSearchText(event.target.value);
 
-  const bookSearch = () => {
-    console.log(searchText);
-    console.log(checkedItems);
-  };
-
-  const RankingList = (): JSX.Element => {
+  const useSearch = () => {
     const fetcher = (url: string) => axios.get(url).then((res) => res.data);
-    const { data, error } = useSWRImmutable(
-      `/api/proxy/novelapi/api?out=json&lim=20&of=t-n-u-w-s-bg-g-gl-nt-ga-e-i-iti-mp-nu`,
+    const { data, error } = useSWR(
+      `/api/proxy/novelapi/api?out=json&lim=20&of=t-n-u-w-s-bg-g-gl-nt-ga-e-i-iti-mp-nu&word=${searchText}`,
       fetcher
     );
-    if (error)
+    return {
+      books: data,
+      isLoading: !error && !data,
+      isError: error,
+    };
+  };
+
+  // const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   let updateList = [...checkedItems];
+  //   if (event.target.checked) {
+  //     updateList = [...checkedItems, event.target.checked];
+  //   } else {
+  //     updateList.splice(checkedItems.indexOf(event.target.checked));
+  //   }
+  //   console.log(updateList);
+  //   setCheckedItems(updateList);
+  // };
+
+  const RankingList = (): JSX.Element => {
+    const { books, isLoading, isError } = useSearch();
+    if (isError)
       return (
         <Alert status="error">
           <AlertIcon />
@@ -50,7 +59,7 @@ export default function Search(): JSX.Element {
           <AlertDescription>ページを更新してください。</AlertDescription>
         </Alert>
       );
-    if (!data)
+    if (isLoading)
       return (
         <Center>
           <Spinner
@@ -63,7 +72,7 @@ export default function Search(): JSX.Element {
           <div>loading...</div>
         </Center>
       );
-    return data.map((narouData: NarouBookData, i: number) => {
+    return books.map((narouData: NarouBookData, i: number) => {
       if (i === 0) return <div key={i}></div>;
       return (
         <Box key={i} borderWidth="1px" borderRadius="lg" p="2">
@@ -84,9 +93,17 @@ export default function Search(): JSX.Element {
                 複数条件で検索する場合はスペースで区切ってください。
               </Text>
             </Box>
-            <Button onClick={() => bookSearch()}>検索</Button>
+            {/* <Button
+              onClick={() => {
+                mutate(
+                  `/api/proxy/novelapi/api?out=json&lim=20&of=t-n-u-w-s-bg-g-gl-nt-ga-e-i-iti-mp-nu&word=${searchText}`
+                );
+              }}
+            >
+              検索
+            </Button> */}
           </Stack>
-          <Text>検索条件を選択してください</Text>
+          {/* <Text>検索条件を選択してください</Text>
           <Checkbox
             isChecked={allChecked}
             isIndeterminate={isIndeterminate}
@@ -102,6 +119,19 @@ export default function Search(): JSX.Element {
             すべて選択
           </Checkbox>
           <Stack pl={6} mt={1} spacing={1}>
+            {searchCategory.map((category, i) => {
+              console.log("aaa");
+              return (
+                <Checkbox
+                  key={i}
+                  isChecked={checkedItems[i]}
+                  onChange={handleCheck}
+                >
+                  {category}
+                </Checkbox>
+              );
+            })}
+
             <Checkbox
               isChecked={checkedItems[0]}
               onChange={(e) => {
@@ -134,7 +164,7 @@ export default function Search(): JSX.Element {
             >
               作者名
             </Checkbox>
-          </Stack>
+          </Stack> */}
         </Box>
         <Box
           justifyContent={{ md: "center" }}
