@@ -27,7 +27,7 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: "更新された作品", icon: FiHome, href: "/" },
   { name: "月間ランキング", icon: FiTrendingUp, href: "/ranking" },
-  { name: "作品検索", icon: FiCompass, href: "#" },
+  { name: "作品検索", icon: FiCompass, href: "/search" },
 ];
 
 export const SimpleSidebar = ({

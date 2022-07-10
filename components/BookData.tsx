@@ -1,28 +1,28 @@
-import { Box, HStack, Badge, Link } from "@chakra-ui/react";
+import { Box, HStack, Badge, Link, Text } from "@chakra-ui/react";
 import React from "react";
 
-const nGenre: { [key: number]: string } = {
-  101: "異世界〔恋愛〕",
-  102: "現実世界〔恋愛〕",
-  201: "ハイファンタジー〔ファンタジー〕",
-  202: "ローファンタジー〔ファンタジー〕",
-  301: "純文学〔文芸〕",
-  302: "ヒューマンドラマ〔文芸〕",
-  303: "歴史〔文芸〕",
-  304: "推理〔文芸〕",
-  305: "ホラー〔文芸〕",
-  306: "アクション〔文芸〕",
-  307: "コメディー〔文芸〕",
-  401: "VRゲーム〔SF〕",
-  402: "宇宙〔SF〕",
-  403: "空想科学〔SF〕",
-  404: "パニック〔SF〕",
-  9901: "童話〔その他〕",
-  9902: "詩〔その他〕",
-  9903: "エッセイ〔その他〕",
-  9904: "リプレイ〔その他〕",
-  9999: "その他〔その他〕",
-  9801: "ノンジャンル〔ノンジャンル〕",
+const nGenre: { [key: number]: { genre: string; color: string } } = {
+  101: { genre: "異世界〔恋愛〕", color: "pink" },
+  102: { genre: "現実世界〔恋愛〕", color: "pink" },
+  201: { genre: "ハイファンタジー〔ファンタジー〕", color: "cyan" },
+  202: { genre: "ローファンタジー〔ファンタジー〕", color: "cyan" },
+  301: { genre: "純文学〔文芸〕", color: "orange" },
+  302: { genre: "ヒューマンドラマ〔文芸〕", color: "orange" },
+  303: { genre: "歴史〔文芸〕", color: "orange" },
+  304: { genre: "推理〔文芸〕", color: "orange" },
+  305: { genre: "ホラー〔文芸〕", color: "orange" },
+  306: { genre: "アクション〔文芸〕", color: "orange" },
+  307: { genre: "コメディー〔文芸〕", color: "orange" },
+  401: { genre: "VRゲーム〔SF〕", color: "purple" },
+  402: { genre: "宇宙〔SF〕", color: "purple" },
+  403: { genre: "空想科学〔SF〕", color: "purple" },
+  404: { genre: "パニック〔SF〕", color: "purple" },
+  9901: { genre: "童話〔その他〕", color: "gray" },
+  9902: { genre: "詩〔その他〕", color: "gray" },
+  9903: { genre: "エッセイ〔その他〕", color: "gray" },
+  9904: { genre: "リプレイ〔その他〕", color: "gray" },
+  9999: { genre: "その他〔その他〕", color: "blackAlpha" },
+  9801: { genre: "ノンジャンル〔ノンジャンル〕", color: "blackAlpha" },
 };
 
 type props = {
@@ -49,20 +49,6 @@ export const BookData = ({ narouData }: props): JSX.Element => {
     narouData.isstop
   );
 
-  const nGenreColor = (genre: number) => {
-    return genre === (101 || 102)
-      ? "pink"
-      : genre === (201 || 202)
-      ? "cyan"
-      : genre === (301 || 302 || 303 || 304 || 305 || 306 || 307)
-      ? "orange"
-      : genre === (401 || 402 || 403 || 404)
-      ? "purple"
-      : genre === (9901 || 9902 || 9903 || 9904)
-      ? "gray"
-      : "blackAlpha";
-  };
-
   return (
     <Box>
       <HStack py={1} mb={1}>
@@ -73,9 +59,9 @@ export const BookData = ({ narouData }: props): JSX.Element => {
         <Badge
           borderRadius="full"
           px="2"
-          colorScheme={nGenreColor(narouData.genre)}
+          colorScheme={nGenre[narouData.genre].color}
         >
-          {nGenre[narouData.genre]}
+          {nGenre[narouData.genre].genre}
         </Badge>
       </HStack>
       <Link
@@ -98,11 +84,16 @@ export const BookData = ({ narouData }: props): JSX.Element => {
           </Link>
         }
       </Box>
-      <HStack spacing={8} py={3}>
-        <Box fontSize={"sm"} noOfLines={10}>
+      <Box spacing={8} py={3}>
+        <Text
+          whiteSpace="unset"
+          wordBreak="break-all"
+          fontSize={"sm"}
+          noOfLines={10}
+        >
           {narouData.story}
-        </Box>
-      </HStack>
+        </Text>
+      </Box>
       <Box fontSize={"smaller"} fontFamily="-moz-initial">
         最終投稿日：{narouData.general_lastup}
       </Box>
