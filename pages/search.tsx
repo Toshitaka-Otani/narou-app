@@ -2,6 +2,7 @@ import { Box, Input, Stack, Text, Button, useToast } from "@chakra-ui/react";
 import axios from "../axios";
 import React, { useEffect, useState } from "react";
 import { BookData } from "../components/BookData";
+import { apiUrl } from "../const";
 
 export default function Search(): JSX.Element {
   const [searchText, setSearchText] = useState<string>("");
@@ -17,9 +18,7 @@ export default function Search(): JSX.Element {
       setErrorToastMessage("条件を入力してください。");
     } else {
       axios
-        .get(
-          `/api/proxy/novelapi/api?out=json&lim=20&of=t-n-u-w-s-bg-g-gl-nt-ga-e-i-iti-mp-nu&word=${searchText}`
-        )
+        .get(`${apiUrl}&word=${searchText}`)
         .then((r) => {
           setBooks(r.data);
         })

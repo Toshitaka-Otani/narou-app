@@ -5,7 +5,6 @@ import {
   AlertTitle,
   Box,
   Center,
-  Container,
   HStack,
   Spinner,
   Tab,
@@ -19,6 +18,7 @@ import React from "react";
 import axios from "../axios";
 import useSWRImmutable from "swr/immutable";
 import { BookData } from "../components/BookData";
+import { apiUrl } from "../const";
 
 export default function Ranking(): JSX.Element {
   const tabCategoryParam = [
@@ -36,7 +36,7 @@ export default function Ranking(): JSX.Element {
   const RankingList = ({ param }: props): JSX.Element => {
     const fetcher = (url: string) => axios.get(url).then((res) => res.data);
     const { data, error } = useSWRImmutable(
-      `/api/proxy/novelapi/api?out=json&lim=100&order=monthlypoint${param}&of=t-n-u-w-s-bg-g-gl-nt-ga-e-i-iti-mp-nu`,
+      `${apiUrl}&order=monthlypoint${param}`,
       fetcher
     );
     if (error)
