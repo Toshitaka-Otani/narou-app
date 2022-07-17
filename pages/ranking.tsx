@@ -63,7 +63,7 @@ export default function Ranking(): JSX.Element {
     return data.map((narouData: NarouBookData, i: number) => {
       if (i === 0) return <div key={i}></div>;
       return (
-        <Box key={i} borderWidth="1px" borderRadius="lg" padding="2">
+        <Box key={i} borderWidth="1px" borderRadius="lg" p="2">
           <HStack>
             <Box display="flex" alignSelf="flex-start" whiteSpace="nowrap">
               {i}位

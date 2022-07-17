@@ -46,7 +46,7 @@ export default function Search(): JSX.Element {
     return books.map((narouData: NarouBookData, i: number) => {
       if (i === 0) return <div key={i}></div>;
       return (
-        <Box key={i} borderWidth="1px" borderRadius="lg" p="2">
+        <Box key={i} borderWidth="1px" borderRadius="lg" p="2" mt="2">
           <BookData narouData={narouData} />
         </Box>
       );
