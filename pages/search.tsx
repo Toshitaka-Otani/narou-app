@@ -1,23 +1,12 @@
-import {
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
-  Spinner,
-  Box,
-  Input,
-  Stack,
-  Center,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Input, Stack, Text, Button } from "@chakra-ui/react";
 import axios from "../axios";
 import React, { useState } from "react";
 import { BookData } from "../components/BookData";
-import useSWR from "swr";
 
 export default function Search(): JSX.Element {
   // const [checkedItems, setCheckedItems] = useState([]);
   const [searchText, setSearchText] = useState<string>("");
+  const [books, setBooks] = useState<NarouBookData[]>([]);
   // const allChecked = checkedItems.every(Boolean);
   // const isIndeterminate = checkedItems.some(Boolean) && !allChecked;
   // const searchCategory = ["タイトル", "あらすじ", "キーワード", "作者名"];
@@ -25,17 +14,15 @@ export default function Search(): JSX.Element {
   const handleChange = (event: { target: { value: string } }) =>
     setSearchText(event.target.value);
 
-  const useSearch = () => {
-    const fetcher = (url: string) => axios.get(url).then((res) => res.data);
-    const { data, error } = useSWR(
-      `/api/proxy/novelapi/api?out=json&lim=20&of=t-n-u-w-s-bg-g-gl-nt-ga-e-i-iti-mp-nu&word=${searchText}`,
-      fetcher
-    );
-    return {
-      books: data,
-      isLoading: !error && !data,
-      isError: error,
-    };
+  const handleClick = () => {
+    console.log("aaaaaa");
+    axios
+      .get(
+        `/api/proxy/novelapi/api?out=json&lim=20&of=t-n-u-w-s-bg-g-gl-nt-ga-e-i-iti-mp-nu&word=${searchText}`
+      )
+      .then((r) => {
+        setBooks(r.data);
+      });
   };
 
   // const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,29 +36,9 @@ export default function Search(): JSX.Element {
   //   setCheckedItems(updateList);
   // };
 
-  const RankingList = (): JSX.Element => {
-    const { books, isLoading, isError } = useSearch();
-    if (isError)
-      return (
-        <Alert status="error">
-          <AlertIcon />
-          <AlertTitle>データの取得に失敗しました。</AlertTitle>
-          <AlertDescription>ページを更新してください。</AlertDescription>
-        </Alert>
-      );
-    if (isLoading)
-      return (
-        <Center>
-          <Spinner
-            thickness="4px"
-            speed="1s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="xl"
-          />
-          <div>loading...</div>
-        </Center>
-      );
+  const rankingList = (): JSX.Element[] | JSX.Element => {
+    if (!books.length) return <Box>検索するとこちらに表示されます。</Box>;
+    if (!books[0].allcount) return <Box>該当の作品がありません</Box>;
     return books.map((narouData: NarouBookData, i: number) => {
       if (i === 0) return <div key={i}></div>;
       return (
@@ -93,15 +60,7 @@ export default function Search(): JSX.Element {
                 複数条件で検索する場合はスペースで区切ってください。
               </Text>
             </Box>
-            {/* <Button
-              onClick={() => {
-                mutate(
-                  `/api/proxy/novelapi/api?out=json&lim=20&of=t-n-u-w-s-bg-g-gl-nt-ga-e-i-iti-mp-nu&word=${searchText}`
-                );
-              }}
-            >
-              検索
-            </Button> */}
+            <Button onClick={handleClick}>検索</Button>
           </Stack>
           {/* <Text>検索条件を選択してください</Text>
           <Checkbox
@@ -170,7 +129,7 @@ export default function Search(): JSX.Element {
           justifyContent={{ md: "center" }}
           w={{ base: "full", md: "container.sm" }}
         >
-          <RankingList />
+          {rankingList()}
         </Box>
       </Box>
     </>
