@@ -29,10 +29,6 @@ export default function Search(): JSX.Element {
     }
   };
 
-  const handleKeyPress = () => {
-    handleClick();
-  };
-
   useEffect(() => {
     if (errorToastMessage) {
       toast({
@@ -68,7 +64,7 @@ export default function Search(): JSX.Element {
                 onChange={handleChange}
                 onKeyPress={(e) => {
                   if (e.key == "Enter") {
-                    handleKeyPress();
+                    handleClick();
                   }
                 }}
                 placeholder="転生　勇者"
