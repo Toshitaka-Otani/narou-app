@@ -1,4 +1,5 @@
 type NarouBookData = {
+  allcount: number;
   all_hyoka_cnt: number;
   all_point: number;
   biggenre: number;
